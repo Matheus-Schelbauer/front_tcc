@@ -8,12 +8,14 @@ import ProductHowItWorks from './modules/views/ProductHowItWorks';
 import ProductCTA from './modules/views/ProductCTA';
 import AppAppBar from './modules/views/AppAppBar';
 import withRoot from './modules/withRoot';
+import DenseTable from './modules/views/Carteiras';
 
 function Index() {
   return (
     <React.Fragment>
       <AppAppBar />
       <ProductHero />
+      <DenseTable/>
       <ProductValues />
       <ProductCategories />
       <ProductHowItWorks />
