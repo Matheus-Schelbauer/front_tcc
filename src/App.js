@@ -6,14 +6,15 @@ import { Fragment } from 'react';
 import AppRouter from './routes/Index';
 import withRoot from '../src/view/modules/withRoot.js';
 import AppHeader from './components/AppHeader.js';
+import AppFooter from './components/AppFooter.js';
 
 function App() {
   return (
-    <Fragment>
+    <div className='App'>
       <AppHeader />
       <AppRouter />
-
-    </Fragment>
+      <AppFooter />
+    </div>
   );
 }
 
