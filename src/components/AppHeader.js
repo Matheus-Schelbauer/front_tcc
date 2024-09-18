@@ -48,13 +48,15 @@ function AppHeader() {
           sx={{ justifyContent: "space-around", minHeight: "83px !important" }}
         >
           <Box sx={{ flex: 1 }} />
-          <Box sx={{ flex: 1 }}>
+          <Button sx={{ flex: 1, margin: "1 px"}} >
             <img
-              src="ProxInvestLogo.svg"
+              src="ProxInvestLogo-removebg-preview.png"
               alt="Logo da ProxInvest"
-              style={{ height: "120px", width: "auto" }}
+              style={{ height: "60px", width: "auto" }}
+              onClick={()=>{
+                navigate ("/")}}
             />
-          </Box>
+          </Button>
 
           {
           createNavigationButton("Home", ()=>{
