@@ -39,3 +39,7 @@
     transform: rotate(360deg);
   }
 }
+
+.MainContent{
+  padding: 1.5%;
+}

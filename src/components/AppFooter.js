@@ -18,7 +18,7 @@ export default function AppFooter() {
           color: "secondary.light",
           }}>
           
-        Trabalho de Conclusão de Curso de Especialização em Desenvolvimento Ágil de Software - Matheus da Rocha Schelbauer          
+        {"Trabalho de Conclusão de Curso de Especialização em Desenvolvimento Ágil de Software - Matheus da Rocha Schelbauer"}          
         </Box>
       </Container>
     </Typography>

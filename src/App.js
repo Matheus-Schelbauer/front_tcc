@@ -7,12 +7,16 @@ import AppRouter from './routes/Index';
 import withRoot from '../src/view/modules/withRoot.js';
 import AppHeader from './components/AppHeader.js';
 import AppFooter from './components/AppFooter.js';
+import { Container } from '@mui/material';
 
 function App() {
   return (
     <div className='App'>
       <AppHeader />
-      <AppRouter />
+      <Container className='MainContent' >
+        <AppRouter />
+        
+      </Container>
       <AppFooter />
     </div>
   );
