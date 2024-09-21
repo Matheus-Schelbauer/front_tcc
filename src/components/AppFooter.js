@@ -5,6 +5,7 @@ import Link from "@mui/material/Link";
 import Container from "@mui/material/Container";
 import Typography from "../view/modules/components/Typography";
 import TextField from "../view/modules/components/TextField";
+import { Button } from "@mui/material";
 
 
 export default function AppFooter() {
@@ -19,6 +20,14 @@ export default function AppFooter() {
           }}>
           
         {"Trabalho de Conclusão de Curso de Especialização em Desenvolvimento Ágil de Software - Matheus da Rocha Schelbauer"}          
+        </Box>
+        <Box sx={{ }}>
+          <Link href="https://github.com/Matheus-Schelbauer" target="_blank" rel="noopener noreferrer">
+            <Button sx={{borderRadius: "50%", bgcolor: "lightgray", margin: "5px", }}>
+              <img src="gitHub_icon.png" style={{ height: "40px", width: "40px", margin: "5px" }}>
+              </img>
+          </Button>
+          </Link>
         </Box>
       </Container>
     </Typography>
