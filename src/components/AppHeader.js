@@ -81,7 +81,7 @@ function AppHeader() {
               color="inherit"
               variant="h6"
               underline="none"
-              href="/premium-themes/onepirate/sign-in/"
+              // href="/premium-themes/onepirate/sign-in/"
               sx={{ ...rightLink, color: "primary.dark" }}
             >
               {"Sign In"}
@@ -89,7 +89,7 @@ function AppHeader() {
             <Link
               variant="h6"
               underline="none"
-              href="/premium-themes/onepirate/sign-up/"
+              // href="/premium-themes/onepirate/sign-up/"
               sx={{ ...rightLink, color: "primary.dark" }}
             >
               {"Sign Up"}
