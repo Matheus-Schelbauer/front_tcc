@@ -42,41 +42,9 @@ function SignIn() {
       }}
     >
       <Typography>
-        <h1>Por favor insira suas informações de usuário</h1>
+        <h1>Depois de terminar o signUp, copiar as infomações aqui retirando as não usadas</h1>
       </Typography>
-      {createTextField("Email", "Email", "Email", "email")}
-      {createTextField("Senha", "Senha", "Senha", "password")}
-
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "center",
-          alignItems: "center",
-        }}
-      >
-        <Button
-          component="section"
-          sx={{
-            p: 2,
-            border: "1px solid black",
-            borderRadius: "0px",
-            backgroundColor: "#f7c94a",
-            height: 45,
-            width: 250,
-            textAlign: "center",
-            margin: 1,
-            color: "primary.dark",
-            fontSize: "20px",
-            display: "flex",
-          }}
-          //   onClick={onClick
-          //   }
-        >
-          
-          {"Acessar conta"}
-        </Button>
-      </Box>
+     
     </Container>
   );
 }
