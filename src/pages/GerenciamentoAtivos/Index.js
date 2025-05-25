@@ -21,6 +21,13 @@ import top100Films from "../../components/top100films";
 // mudar o import do autocomplete do Create Ativo
 // mudar o tipo de variável no DB da coluna ticketCode de char para "string"
 
+const MOCK_WALLET_ID = {
+  id: 1,
+  name: "Mercado BTC\t",
+  description: "BTC, ADA",
+  walletValue: 20000.0,
+};
+
 function createData(nomeAtivo, valorUnitario, quantidade) {
   var valorTotal = valorUnitario * quantidade;
   return { nomeAtivo, valorUnitario, quantidade, valorTotal };
@@ -63,7 +70,7 @@ function Ativos() {
   return (
     <Container>
       <Box>
-        <h1>Ativos presentes na ~CarteiraAtual.</h1>
+        <h1>Ativos presentes na carteira {MOCK_WALLET_ID.name}.</h1>
       </Box>
       <br></br>
       <TableContainer component={Paper}>
@@ -208,24 +215,24 @@ function Ativos() {
           </Typography>
 
           <TextField
-  id="ativo-Quantidade"
-  label="Quantidade"
-  variant="outlined"
-  sx={{ width: "100%" }}
-  slotProps={{
-    input: {
-      inputMode: "decimal", // Ensures numeric keyboard with decimal support on mobile
-      pattern: "[0-9]*[.,]?[0-9]*", // Ensures only numbers and decimals are allowed
-      onInput: (e) => {
-        // Validate input to ensure only numbers and one decimal point are allowed
-        const value = e.target.value.replace(",", "."); // Replaces commas with dots
-        if (!/^\d*\.?\d*$/.test(value)) {
-          e.target.value = value.slice(0, -1); // Prevents invalid input
-        }
-      }
-    }
-  }}
-/>
+            id="ativo-Quantidade"
+            label="Quantidade"
+            variant="outlined"
+            sx={{ width: "100%" }}
+            slotProps={{
+              input: {
+                inputMode: "decimal", // Ensures numeric keyboard with decimal support on mobile
+                pattern: "[0-9]*[.,]?[0-9]*", // Ensures only numbers and decimals are allowed
+                onInput: (e) => {
+                  // Validate input to ensure only numbers and one decimal point are allowed
+                  const value = e.target.value.replace(",", "."); // Replaces commas with dots
+                  if (!/^\d*\.?\d*$/.test(value)) {
+                    e.target.value = value.slice(0, -1); // Prevents invalid input
+                  }
+                },
+              },
+            }}
+          />
 
           <Button align="left" sx={{ color: "black", width: "50%" }}>
             {"Salvar"}
