@@ -16,11 +16,19 @@ import {
   Tooltip,
 } from "@mui/material";
 import Typography from "../../view/modules/components/Typography";
-import top100Films from "../../components/top100films";
+import tickers from "../../components/allTickersBr";
+import api from "../../services/services";
 
 // mudar o import do autocomplete do Create Ativo
 // mudar o tipo de variável no DB da coluna ticketCode de char para "string"
 
+// 👇 MOCK de userId temporário e wallet
+const MOCK_USER_ID = {
+  id: 1,
+  name: "Dreivid",
+  email: "ootaldo@david.com.br",
+  password: "isso",
+};
 const MOCK_WALLET_ID = {
   id: 1,
   name: "Mercado BTC\t",
@@ -28,15 +36,15 @@ const MOCK_WALLET_ID = {
   walletValue: 20000.0,
 };
 
-function createData(nomeAtivo, valorUnitario, quantidade) {
-  var valorTotal = valorUnitario * quantidade;
-  return { nomeAtivo, valorUnitario, quantidade, valorTotal };
-}
+// function createData(nomeAtivo, valorUnitario, quantidade) {
+//   var valorTotal = valorUnitario * quantidade;
+//   return { nomeAtivo, valorUnitario, quantidade, valorTotal };
+// }
 
-const rows = [
-  createData("Bitcoin", 359096, 0.0001),
-  createData("Cardano", 2.176, 22),
-];
+// const rows = [
+//   createData("Bitcoin", 359096, 0.0001),
+//   createData("Cardano", 2.176, 22),
+// ];
 
 const formatCurrency = (value) => {
   return new Intl.NumberFormat("pt-BR", {
@@ -60,12 +68,105 @@ const style = {
 function Ativos() {
   //consts for the delete Modal
   const [openDelete, setDeleteOpen] = React.useState(false);
-  const handleDeleteOpen = () => setDeleteOpen(true);
+  const handleDeleteOpen = (ativo) => {
+    setAtivoDeletando(ativo);
+    setDeleteOpen(true);
+  };
   const handleDeleteClose = () => setDeleteOpen(false);
   //consts for the create Modal
   const [openCreate, setCreateOpen] = React.useState(false);
   const handleCreateOpen = () => setCreateOpen(true);
   const handleCreateClose = () => setCreateOpen(false);
+
+  // 👇 Estado para armazenar as carteiras vindas do back
+  const [assets, setAssets] = React.useState([]);
+
+  // 👇 useEffect que chama a API ao carregar a tela - GET
+  React.useEffect(() => {
+    const fetchAssets = async () => {
+      try {
+        const response = await api.getAssetsByWallet(
+          MOCK_USER_ID.id,
+          MOCK_WALLET_ID.id
+        );
+
+        const ativosComTotal = response.data.map((item) => ({
+          ...item,
+          valorTotal: item.valorUnitario * item.quantidade,
+        }));
+
+        setAssets(ativosComTotal);
+      } catch (error) {
+        console.error("Erro ao buscar ativos:", error);
+      }
+    };
+
+    fetchAssets();
+  }, []);
+
+  // 👇 Estados para criação de ativo
+  const [novoAtivo, setNovoAtivo] = React.useState("");
+  const [quantidade, setQuantidade] = React.useState("");
+
+  const handleCreateAsset = async () => {
+    try {
+      const asset = {
+        ticketCode: novoAtivo,
+        quantity: parseFloat(quantidade),
+        unitaryValue: 0, // 👈 por enquanto defaulta como 0
+        totalValue: 0, // 👈 será recalculado no backend ou depois do fetch
+        walletId: MOCK_WALLET_ID.id,
+        assetOriginalId: 0,
+      };
+
+      await api.createAsset(MOCK_USER_ID.id, MOCK_WALLET_ID.id, asset);
+      handleCreateClose(); // Fecha o modal
+      setNovoAtivo(""); // Limpa os inputs
+      setQuantidade("");
+
+      // 👇 Atualiza os dados da tabela
+      const response = await api.getAssetsByWallet(
+        MOCK_USER_ID.id,
+        MOCK_WALLET_ID.id
+      );
+      setAssets(response.data);
+    } catch (error) {
+      console.error("Erro ao salvar ativo:", error);
+    }
+  };
+
+  // Estado para o modal de edição
+  const [openEdit, setEditOpen] = React.useState(false);
+  const [ativoEditando, setAtivoEditando] = React.useState(null); // guarda o ativo que está sendo editado
+  const handleEditOpen = (ativo) => {
+    setAtivoEditando(ativo);
+    setEditOpen(true);
+  };
+  const handleEditClose = () => {
+    setAtivoEditando(null);
+    setEditOpen(false);
+  };
+
+  // Estado para o modal de deletar
+  const [ativoDeletando, setAtivoDeletando] = React.useState(null);
+
+  const handleDeleteAsset = async () => {
+    try {
+      await api.deleteAsset(ativoDeletando.id);
+
+      // Atualiza a tabela após deletar
+      const response = await api.getAssetsByWallet(
+        MOCK_USER_ID.id,
+        MOCK_WALLET_ID.id
+      );
+      setAssets(response.data);
+
+      handleDeleteClose();
+      setAtivoDeletando(null);
+    } catch (error) {
+      console.error("Erro ao deletar ativo:", error);
+    }
+  };
 
   return (
     <Container>
@@ -93,38 +194,34 @@ function Ativos() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {rows.map((row) => (
+            {assets.map((row) => (
               <TableRow
-                key={row.ativo}
+                key={row.id}
                 sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
               >
                 <TableCell component="th" scope="row">
-                  {row.nomeAtivo}
+                  {row.ticketCode}
                 </TableCell>
                 <TableCell align="right">
-                  {formatCurrency(row.valorUnitario)}
+                  {formatCurrency(row.unitaryValue)}
                 </TableCell>
-                <TableCell align="right">{row.quantidade}</TableCell>
+                <TableCell align="right">{row.quantity}</TableCell>
                 <TableCell align="right">
-                  {formatCurrency(row.valorTotal)}
+                  {formatCurrency(row.totalValue)}
                 </TableCell>
                 <TableCell align="right" sx={{ padding: 0 }}>
-                  <Button>
+                  <Button onClick={() => handleEditOpen(row)}>
                     <img
                       src="edit_icon.png"
                       alt="Imagem de manejo"
                       style={{ height: "25px", width: "auto" }}
-                      // onClick={
-
-                      // } // navegar para manejo
                     />
                   </Button>
-                  <Button>
+                  <Button onClick={() => handleDeleteOpen(row)}>
                     <img
                       src="delete_icon.png"
                       alt="Imagem de deletar"
                       style={{ height: "25px", width: "auto" }}
-                      onClick={handleDeleteOpen} // navegar para modal deletar
                     />
                   </Button>
                 </TableCell>
@@ -155,7 +252,11 @@ function Ativos() {
             certeza que deseja prosseguir?
           </Typography>
           <Box align="center" sx={{ margin: "1px !important" }}>
-            <Button align="left" sx={{ color: "black", width: "50%" }}>
+            <Button
+              align="left"
+              sx={{ color: "black", width: "50%" }}
+              onClick={handleDeleteAsset}
+            >
               {"Sim"}
             </Button>
             <Button
@@ -204,12 +305,15 @@ function Ativos() {
           <Typography id="modal-create-description" sx={{ mt: 2 }}>
             Digite o nome do ativo a ser inserido.
           </Typography>
-          <Autocomplete //mudar para o objeto com os Ativos
+          <Autocomplete
             disablePortal
-            options={top100Films} // este objeto tem que mudar
+            options={tickers} // mudar objeto depois
             sx={{ width: "100%" }}
-            renderInput={(params) => <TextField {...params} label="Ativo" />}
-          />
+            getOptionLabel={(option) => (option.Ticker + " - " + option.Nome) || ""}
+            onChange={(event, value) => setNovoAtivo(value?.Ticker || "")}
+            renderInput={(params) => <TextField {...params} Ticker="Ativo" />}
+          /> 
+
           <Typography id="modal-create-description" sx={{ mt: 2 }}>
             Quantidade.
           </Typography>
@@ -218,23 +322,28 @@ function Ativos() {
             id="ativo-Quantidade"
             label="Quantidade"
             variant="outlined"
+            value={quantidade}
+            onChange={(e) => setQuantidade(e.target.value)}
             sx={{ width: "100%" }}
             slotProps={{
               input: {
-                inputMode: "decimal", // Ensures numeric keyboard with decimal support on mobile
-                pattern: "[0-9]*[.,]?[0-9]*", // Ensures only numbers and decimals are allowed
+                inputMode: "decimal",
+                pattern: "[0-9]*[.,]?[0-9]*",
                 onInput: (e) => {
-                  // Validate input to ensure only numbers and one decimal point are allowed
-                  const value = e.target.value.replace(",", "."); // Replaces commas with dots
+                  const value = e.target.value.replace(",", ".");
                   if (!/^\d*\.?\d*$/.test(value)) {
-                    e.target.value = value.slice(0, -1); // Prevents invalid input
+                    e.target.value = value.slice(0, -1);
                   }
                 },
               },
             }}
           />
 
-          <Button align="left" sx={{ color: "black", width: "50%" }}>
+          <Button
+            align="left"
+            sx={{ color: "black", width: "50%" }}
+            onClick={handleCreateAsset}
+          >
             {"Salvar"}
           </Button>
           <Button
@@ -244,6 +353,76 @@ function Ativos() {
           >
             {"Cancelar"}
           </Button>
+        </Box>
+      </Modal>
+
+      <Modal
+        id="editModal"
+        open={openEdit}
+        onClose={handleEditClose}
+        aria-labelledby="modal-edit-ativo"
+        aria-describedby="modal-edit-description"
+      >
+        <Box sx={style}>
+          <Typography id="modal-edit-ativo" variant="h6" component="h2">
+            EDITAR ATIVO
+          </Typography>
+          <Typography sx={{ mt: 2 }}>
+            Atualize a quantidade do ativo {ativoEditando?.ticketCode}
+          </Typography>
+
+          <TextField
+            label="Quantidade"
+            variant="outlined"
+            value={ativoEditando?.quantity || ""}
+            onChange={(e) =>
+              setAtivoEditando((prev) => ({
+                ...prev,
+                quantity: e.target.value,
+              }))
+            }
+            sx={{ width: "100%", mt: 2 }}
+          />
+
+          <Box sx={{ display: "flex", justifyContent: "space-between", mt: 2 }}>
+            <Button
+              sx={{ color: "black", width: "48%" }}
+              onClick={async () => {
+                try {
+                  const assetAtualizado = {
+                    ...ativoEditando,
+                    quantity: parseFloat(ativoEditando.quantity),
+                  };
+
+                  await api.updateAsset(
+                    MOCK_USER_ID.id,
+                    MOCK_WALLET_ID.id,
+                    assetAtualizado.id,
+                    assetAtualizado
+                  );
+
+                  handleEditClose();
+
+                  // Atualiza a tabela após salvar
+                  const response = await api.getAssetsByWallet(
+                    MOCK_USER_ID.id,
+                    MOCK_WALLET_ID.id
+                  );
+                  setAssets(response.data);
+                } catch (error) {
+                  console.error("Erro ao atualizar ativo:", error);
+                }
+              }}
+            >
+              Salvar
+            </Button>
+            <Button
+              sx={{ color: "black", width: "48%" }}
+              onClick={handleEditClose}
+            >
+              Cancelar
+            </Button>
+          </Box>
         </Box>
       </Modal>
     </Container>
