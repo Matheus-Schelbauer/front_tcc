@@ -81,9 +81,7 @@ function SignUp() {
         flexDirection: "column",
       }}
     >
-      <Typography>
         <h1>Por favor complete o formulário abaixo:</h1>
-      </Typography>
       {/* {"Box da form"} */}
       <Box
         component="form"

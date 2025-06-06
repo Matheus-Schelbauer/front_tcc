@@ -200,7 +200,7 @@ function Ativos() {
                 sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
               >
                 <TableCell component="th" scope="row">
-                  {row.ticketCode}
+                  {row.ticketCode} - {row.assetOriginal?.name || ""}
                 </TableCell>
                 <TableCell align="right">
                   {formatCurrency(row.unitaryValue)}
@@ -309,10 +309,12 @@ function Ativos() {
             disablePortal
             options={tickers} // mudar objeto depois
             sx={{ width: "100%" }}
-            getOptionLabel={(option) => (option.Ticker + " - " + option.Nome) || ""}
+            getOptionLabel={(option) =>
+              option.Ticker + " - " + option.Nome || ""
+            }
             onChange={(event, value) => setNovoAtivo(value?.Ticker || "")}
             renderInput={(params) => <TextField {...params} Ticker="Ativo" />}
-          /> 
+          />
 
           <Typography id="modal-create-description" sx={{ mt: 2 }}>
             Quantidade.

@@ -16,6 +16,8 @@ import {
 } from "@mui/material";
 import Typography from "../../view/modules/components/Typography";
 import api from "../../services/services";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../contexts/AuthContext";
 
 // function createData(carteira, saldo, principaisAtivos) {
 //   return { carteira, saldo, principaisAtivos };
@@ -85,6 +87,8 @@ function Carteiras() {
   // 👇 Estado para armazenar as carteiras vindas do back
   const [carteiras, setCarteiras] = React.useState([]);
 
+  const navigate = useNavigate();
+
   const handleCreateWallet = async () => {
     try {
       console.log(MOCK_USER_ID.id);
@@ -144,6 +148,8 @@ function Carteiras() {
     }
   };
 
+  const { user } = useAuth();
+
   // 👇 useEffect que chama a API ao carregar a tela
   React.useEffect(() => {
     const fetchCarteiras = async () => {
@@ -162,8 +168,7 @@ function Carteiras() {
     <Container>
       <Box>
         <h1>
-          Bem vindo, {MOCK_USER_ID.name}, seu saldo atual é de
-          ~sumOfSaldoDaCarteira.
+          Bem vindo, {user?.name}!
         </h1>
       </Box>
       <br></br>
@@ -223,13 +228,11 @@ function Carteiras() {
                     title="Gerenciar ativos da carteira"
                     placement="right"
                   >
-                    <Button>
+                    <Button onClick={() => navigate(`/carteira/${row.id}`)}>
                       <img
                         src="forwardToAssets.png"
                         alt="Imagem de redirecionar à ativos"
                         style={{ height: "30px", width: "auto" }}
-                        // onClick={
-                        // } // navegar para manejo
                       />
                     </Button>
                   </Tooltip>

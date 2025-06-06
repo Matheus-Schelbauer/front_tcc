@@ -5,6 +5,7 @@ import AppBar from "../view/modules/components/AppBar";
 import Toolbar from "../view/modules/components/Toolbar";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@mui/material";
+import { useAuth, SignOut } from "../contexts/AuthContext";
 
 const rightLink = {
   fontSize: 16,
@@ -39,8 +40,13 @@ function createNavigationButton(name, onClick, sizeOfFont) {
 }
 
 function AppHeader() {
+  const { user, isAuthenticated, loading, SignIn, SignOut } = useAuth();
   const navigate = useNavigate();
 
+  const handleLogout = () => {
+    SignOut();
+    navigate('/SignIn')
+  }
   return (
     <div>
       <AppBar position="fixed" sx={{ height: "80px" }}>
@@ -54,7 +60,7 @@ function AppHeader() {
               alt="Logo da ProxInvest"
               style={{ height: "60px", width: "auto" }}
               onClick={()=>{
-                navigate ("/")}}
+                navigate("/")}}
             />
           </Button>
 
@@ -75,26 +81,39 @@ function AppHeader() {
             navigate ("/AnaliseGrafica")
           }, 13)
           }
-
-          <Box sx={{ flex: 1, display: "flex", justifyContent: "flex-end" }}>
+          { !isAuthenticated ?
+            <Box sx={{ flex: 1, display: "flex", justifyContent: "flex-end" }}>
+              <Link
+                color="inherit"
+                variant="h6"
+                underline="none"
+                href="/SignIn"
+                sx={{ ...rightLink, color: "primary.dark" }}
+              >
+                {"Sign In"}
+              </Link>
+              <Link
+                variant="h6"
+                underline="none"
+                href="/SignUp"
+                sx={{ ...rightLink, color: "primary.dark" }}
+              >
+                {"Sign Up"}
+              </Link>
+            </Box>
+            :             
+            <Box sx={{ flex: 1, display: "flex", justifyContent: "flex-end" }}>
             <Link
               color="inherit"
               variant="h6"
               underline="none"
-              href="/SignIn"
+              onClick={handleLogout}
               sx={{ ...rightLink, color: "primary.dark" }}
             >
-              {"Sign In"}
-            </Link>
-            <Link
-              variant="h6"
-              underline="none"
-              href="/SignUp"
-              sx={{ ...rightLink, color: "primary.dark" }}
-            >
-              {"Sign Up"}
+              {"Log out"}
             </Link>
           </Box>
+          }
           <Box sx={{ flex: 1 }} />
         </Toolbar>
       </AppBar>
