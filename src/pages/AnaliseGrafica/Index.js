@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import { PieChart, Pie, Cell, Tooltip, Legend } from "recharts";
 import api from "../../services/services"; // seu apiService
 import { Box, Container } from "@mui/material";
+import { useContext } from "react";
+import { AuthContext } from "../../contexts/AuthContext";
 
 const COLORS = [
   "#8884d8", // Original
@@ -24,20 +26,23 @@ function DashboardPizzas() {
   const [wallets, setWallets] = useState([]);
   const [assetsByWallet, setAssetsByWallet] = useState({});
   const [selectedWalletId, setSelectedWalletId] = useState(null);
+  const { user } = useContext(AuthContext);
 
   useEffect(() => {
+    if (!user?.id) return; // Garante que o user está carregado
+
     // 1. busca wallets
-    api.getWalletsByUser(1).then((res) => setWallets(res.data));
+    api.getWalletsByUser(user.id).then((res) => setWallets(res.data));
+
     // 2. pra cada wallet, busca assets
-    api.getWalletsByUser(1).then((res) => {
+    api.getWalletsByUser(user.id).then((res) => {
       res.data.forEach((w) => {
-        api.getAssetsByWallet(1, w.id).then((r2) => {
-          // calcula totalValue se precisar
+        api.getAssetsByWallet(user.id, w.id).then((r2) => {
           setAssetsByWallet((prev) => ({ ...prev, [w.id]: r2.data }));
         });
       });
     });
-  }, []);
+  }, [user?.id]);
 
   const totalAll = wallets.reduce((sum, w) => sum + w.walletValue, 0);
   const walletData = wallets.map((w) => ({

@@ -73,9 +73,9 @@ function AppHeader() {
             navigate ("/Carteiras")
           })}
 
-          {createNavigationButton("Gerenciamento de Ativos", ()=>{
+          {/* {createNavigationButton("Gerenciamento de Ativos", ()=>{
             navigate ("/GerenciamentoAtivos")
-          }, 13)}
+          }, 13)} */}
 
           {createNavigationButton("Análise gráfica", ()=>{
             navigate ("/AnaliseGrafica")

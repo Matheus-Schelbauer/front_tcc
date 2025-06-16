@@ -18,9 +18,8 @@ import {
 import Typography from "../../view/modules/components/Typography";
 import tickers from "../../components/allTickersBr";
 import api from "../../services/services";
-
-// mudar o import do autocomplete do Create Ativo
-// mudar o tipo de variável no DB da coluna ticketCode de char para "string"
+import { useParams } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 
 // 👇 MOCK de userId temporário e wallet
 const MOCK_USER_ID = {
@@ -66,6 +65,10 @@ const style = {
 };
 
 function Ativos() {
+  const { walletId } = useParams();
+  const location = useLocation();
+  const walletName = location.state?.walletName || "Carteira"; // fallback se não vier nada
+
   //consts for the delete Modal
   const [openDelete, setDeleteOpen] = React.useState(false);
   const handleDeleteOpen = (ativo) => {
@@ -83,11 +86,13 @@ function Ativos() {
 
   // 👇 useEffect que chama a API ao carregar a tela - GET
   React.useEffect(() => {
+    console.log("ID da carteira recebida:", walletId);
+
     const fetchAssets = async () => {
       try {
         const response = await api.getAssetsByWallet(
           MOCK_USER_ID.id,
-          MOCK_WALLET_ID.id
+          parseInt(walletId)
         );
 
         const ativosComTotal = response.data.map((item) => ({
@@ -115,11 +120,11 @@ function Ativos() {
         quantity: parseFloat(quantidade),
         unitaryValue: 0, // 👈 por enquanto defaulta como 0
         totalValue: 0, // 👈 será recalculado no backend ou depois do fetch
-        walletId: MOCK_WALLET_ID.id,
+        walletId: parseInt(walletId),
         assetOriginalId: 0,
       };
 
-      await api.createAsset(MOCK_USER_ID.id, MOCK_WALLET_ID.id, asset);
+      await api.createAsset(MOCK_USER_ID.id, parseInt(walletId), asset);
       handleCreateClose(); // Fecha o modal
       setNovoAtivo(""); // Limpa os inputs
       setQuantidade("");
@@ -127,7 +132,7 @@ function Ativos() {
       // 👇 Atualiza os dados da tabela
       const response = await api.getAssetsByWallet(
         MOCK_USER_ID.id,
-        MOCK_WALLET_ID.id
+        parseInt(walletId)
       );
       setAssets(response.data);
     } catch (error) {
@@ -157,7 +162,7 @@ function Ativos() {
       // Atualiza a tabela após deletar
       const response = await api.getAssetsByWallet(
         MOCK_USER_ID.id,
-        MOCK_WALLET_ID.id
+        parseInt(walletId)
       );
       setAssets(response.data);
 
@@ -171,7 +176,8 @@ function Ativos() {
   return (
     <Container>
       <Box>
-        <h1>Ativos presentes na carteira {MOCK_WALLET_ID.name}.</h1>
+        {/* //checkar depois */}
+        <h1>Ativos presentes na carteira {walletName}.</h1>
       </Box>
       <br></br>
       <TableContainer component={Paper}>
@@ -212,14 +218,14 @@ function Ativos() {
                 <TableCell align="right" sx={{ padding: 0 }}>
                   <Button onClick={() => handleEditOpen(row)}>
                     <img
-                      src="edit_icon.png"
+                      src="/edit_icon.png"
                       alt="Imagem de manejo"
                       style={{ height: "25px", width: "auto" }}
                     />
                   </Button>
                   <Button onClick={() => handleDeleteOpen(row)}>
                     <img
-                      src="delete_icon.png"
+                      src="/delete_icon.png"
                       alt="Imagem de deletar"
                       style={{ height: "25px", width: "auto" }}
                     />
@@ -278,7 +284,7 @@ function Ativos() {
       >
         <Button sx={{}} onClick={handleCreateOpen}>
           <img
-            src="add_icon.png"
+            src="/add_icon.png"
             style={{ height: "30px", width: "auto", margin: "5px" }}
           ></img>
           <Typography
@@ -384,8 +390,19 @@ function Ativos() {
               }))
             }
             sx={{ width: "100%", mt: 2 }}
+            slotProps={{
+              input: {
+                inputMode: "decimal",
+                pattern: "[0-9]*[.,]?[0-9]*",
+                onInput: (e) => {
+                  const value = e.target.value.replace(",", ".");
+                  if (!/^\d*\.?\d*$/.test(value)) {
+                    e.target.value = value.slice(0, -1);
+                  }
+                },
+              },
+            }}
           />
-
           <Box sx={{ display: "flex", justifyContent: "space-between", mt: 2 }}>
             <Button
               sx={{ color: "black", width: "48%" }}
@@ -398,7 +415,7 @@ function Ativos() {
 
                   await api.updateAsset(
                     MOCK_USER_ID.id,
-                    MOCK_WALLET_ID.id,
+                    parseInt(walletId),
                     assetAtualizado.id,
                     assetAtualizado
                   );
@@ -408,7 +425,7 @@ function Ativos() {
                   // Atualiza a tabela após salvar
                   const response = await api.getAssetsByWallet(
                     MOCK_USER_ID.id,
-                    MOCK_WALLET_ID.id
+                    parseInt(walletId)
                   );
                   setAssets(response.data);
                 } catch (error) {

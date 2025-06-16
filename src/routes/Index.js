@@ -26,7 +26,7 @@ function AppRouter() {
         <Routes>
             <Route path = "/" element ={<HomePage />} />
             <Route path = "/Carteiras" element = {<ProtectedRoute> <Carteiras /> </ProtectedRoute>} />
-            <Route path = "/GerenciamentoAtivos" element = {<ProtectedRoute><GerenciametoAtivo /></ProtectedRoute> } />
+            <Route path = "/GerenciamentoAtivos/:walletId" element={<ProtectedRoute><GerenciametoAtivo /></ProtectedRoute>} />
             <Route path = "/AnaliseGrafica" element = {<ProtectedRoute> <AnaliseGrafica /> </ProtectedRoute>} />
             <Route path = "/SignUp" element = {<SignUp/>} />
             <Route path = "/SignIn" element = {<SignIn/>} />

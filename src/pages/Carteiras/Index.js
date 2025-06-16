@@ -48,15 +48,17 @@ const style = {
   p: 4,
 };
 
-// 👇 MOCK de userId temporário
-const MOCK_USER_ID = {
-  id: 1,
-  name: "Dreivid",
-  email: "ootaldo@david.com.br",
-  password: "isso",
-};
+// // 👇 MOCK de userId temporário
+// const MOCK_USER_ID = {
+//   id: 1,
+//   name: "Dreivid",
+//   email: "ootaldo@david.com.br",
+//   password: "isso",
+// };
 
 function Carteiras() {
+  const { user } = useAuth(); // usa o id do usuário logado
+
   //consts for the delete Modal
   const [openDelete, setDeleteOpen] = React.useState(false);
   const handleDeleteOpen = () => setDeleteOpen(true);
@@ -91,13 +93,13 @@ function Carteiras() {
 
   const handleCreateWallet = async () => {
     try {
-      console.log(MOCK_USER_ID.id);
-      await api.createWallet(MOCK_USER_ID.id, {
+      console.log(user.id);
+      await api.createWallet(user.id, {
         name: newWalletName,
       });
 
       // Atualiza a lista de carteiras depois de criar
-      const response = await api.getWalletsByUser(MOCK_USER_ID.id);
+      const response = await api.getWalletsByUser(user.id);
       setCarteiras(response.data);
 
       // Limpa o campo e fecha o modal
@@ -112,10 +114,10 @@ function Carteiras() {
     try {
       if (!walletToDelete) return;
 
-      await api.deleteWallet(MOCK_USER_ID.id, walletToDelete.id);
+      await api.deleteWallet(user.id, walletToDelete.id);
 
       // Atualiza a lista de carteiras
-      const response = await api.getWalletsByUser(MOCK_USER_ID.id);
+      const response = await api.getWalletsByUser(user.id);
       setCarteiras(response.data);
 
       // Fecha modal e limpa a carteira selecionada
@@ -130,13 +132,13 @@ function Carteiras() {
     try {
       if (!walletToEdit) return;
 
-      await api.updateWallet(MOCK_USER_ID.id, walletToEdit.id, {
+      await api.updateWallet(user.id, walletToEdit.id, {
         name: editedWalletName,
         walletValue: walletToEdit.walletValue,
       });
 
       // Atualiza a lista
-      const response = await api.getWalletsByUser(MOCK_USER_ID.id);
+      const response = await api.getWalletsByUser(user.id);
       setCarteiras(response.data);
 
       // Limpa os estados e fecha o modal
@@ -148,13 +150,11 @@ function Carteiras() {
     }
   };
 
-  const { user } = useAuth();
-
   // 👇 useEffect que chama a API ao carregar a tela
   React.useEffect(() => {
     const fetchCarteiras = async () => {
       try {
-        const response = await api.getWalletsByUser(MOCK_USER_ID.id);
+        const response = await api.getWalletsByUser(user.id);
         setCarteiras(response.data);
       } catch (error) {
         console.error("Erro ao buscar carteiras:", error);
@@ -167,9 +167,7 @@ function Carteiras() {
   return (
     <Container>
       <Box>
-        <h1>
-          Bem vindo, {user?.name}!
-        </h1>
+        <h1>Bem vindo, {user?.name}!</h1>
       </Box>
       <br></br>
       <TableContainer component={Paper}>
@@ -201,7 +199,7 @@ function Carteiras() {
                 <TableCell align="right" sx={{ padding: 0 }}>
                   <Button>
                     <img
-                      src="edit_icon.png"
+                      src="/edit_icon.png"
                       alt="Imagem de manejo"
                       style={{ height: "25px", width: "auto" }}
                       onClick={() => {
@@ -214,7 +212,7 @@ function Carteiras() {
                   </Button>
                   <Button>
                     <img
-                      src="delete_icon.png"
+                      src="/delete_icon.png"
                       alt="Imagem de deletar"
                       style={{ height: "25px", width: "auto" }}
                       onClick={() => {
@@ -228,9 +226,15 @@ function Carteiras() {
                     title="Gerenciar ativos da carteira"
                     placement="right"
                   >
-                    <Button onClick={() => navigate(`/carteira/${row.id}`)}>
+                    <Button
+                      onClick={() =>
+                        navigate(`/GerenciamentoAtivos/${row.id}`, {
+                          state: { walletName: row.name },
+                        })
+                      }
+                    >
                       <img
-                        src="forwardToAssets.png"
+                        src="/forwardToAssets.png"
                         alt="Imagem de redirecionar à ativos"
                         style={{ height: "30px", width: "auto" }}
                       />
@@ -289,7 +293,7 @@ function Carteiras() {
       >
         <Button sx={{}} onClick={handleCreateOpen}>
           <img
-            src="add_icon.png"
+            src="/add_icon.png"
             style={{ height: "30px", width: "auto", margin: "5px" }}
           ></img>
           <Typography
